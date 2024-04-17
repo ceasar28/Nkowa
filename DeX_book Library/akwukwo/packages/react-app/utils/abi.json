@@ -1,0 +1,483 @@
+[
+  { "type": "constructor", "stateMutability": "nonpayable" },
+  {
+    "name": "Approval",
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "approved",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "type": "event"
+  },
+  {
+    "name": "ApprovalForAll",
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "approved",
+        "type": "bool"
+      }
+    ],
+    "type": "event"
+  },
+  {
+    "name": "TokenListedSuccess",
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "RoyaltyReciever",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "RoyaltyFee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "salesfee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "currentlyListed",
+        "type": "bool"
+      }
+    ],
+    "type": "event"
+  },
+  {
+    "name": "Transfer",
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "type": "event"
+  },
+  {
+    "name": "_itemsSold",
+    "outputs": [
+      { "internalType": "uint256", "name": "_value", "type": "uint256" }
+    ],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "approve",
+    "inputs": [
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "type": "function",
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "balanceOf",
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "createToken",
+    "inputs": [
+      { "internalType": "string", "name": "tokenURI", "type": "string" },
+      { "internalType": "uint256", "name": "price", "type": "uint256" },
+      { "internalType": "uint256", "name": "number", "type": "uint256" }
+    ],
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "type": "function",
+    "stateMutability": "payable"
+  },
+  {
+    "name": "deListToken",
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+          {
+            "internalType": "address payable",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "seller",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "RoyaltyReceiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "Royaltyfee",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "salesfee", "type": "uint256" },
+          { "internalType": "uint256", "name": "price", "type": "uint256" },
+          { "internalType": "bool", "name": "currentlyListed", "type": "bool" }
+        ],
+        "internalType": "struct Akwukwo1.ListedToken",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "type": "function",
+    "stateMutability": "payable"
+  },
+  {
+    "name": "executeSale",
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "type": "function",
+    "stateMutability": "payable"
+  },
+  {
+    "name": "getAllNFTs",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+          {
+            "internalType": "address payable",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "seller",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "RoyaltyReceiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "Royaltyfee",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "salesfee", "type": "uint256" },
+          { "internalType": "uint256", "name": "price", "type": "uint256" },
+          { "internalType": "bool", "name": "currentlyListed", "type": "bool" }
+        ],
+        "internalType": "struct Akwukwo1.ListedToken[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "getApproved",
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "getCurrentToken",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "getLatestIdToListedToken",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+          {
+            "internalType": "address payable",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "seller",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "RoyaltyReceiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "Royaltyfee",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "salesfee", "type": "uint256" },
+          { "internalType": "uint256", "name": "price", "type": "uint256" },
+          { "internalType": "bool", "name": "currentlyListed", "type": "bool" }
+        ],
+        "internalType": "struct Akwukwo1.ListedToken",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "getListedTokenForId",
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+          {
+            "internalType": "address payable",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "seller",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "RoyaltyReceiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "Royaltyfee",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "salesfee", "type": "uint256" },
+          { "internalType": "uint256", "name": "price", "type": "uint256" },
+          { "internalType": "bool", "name": "currentlyListed", "type": "bool" }
+        ],
+        "internalType": "struct Akwukwo1.ListedToken",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "getMyNFTs",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+          {
+            "internalType": "address payable",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "seller",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "RoyaltyReceiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "Royaltyfee",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "salesfee", "type": "uint256" },
+          { "internalType": "uint256", "name": "price", "type": "uint256" },
+          { "internalType": "bool", "name": "currentlyListed", "type": "bool" }
+        ],
+        "internalType": "struct Akwukwo1.ListedToken[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "isApprovedForAll",
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "address", "name": "operator", "type": "address" }
+    ],
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "listToken",
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "internalType": "uint256", "name": "price", "type": "uint256" }
+    ],
+    "type": "function",
+    "stateMutability": "payable"
+  },
+  {
+    "name": "name",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "ownerOf",
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "safeTransferFrom",
+    "inputs": [
+      { "internalType": "address", "name": "from", "type": "address" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "type": "function",
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "safeTransferFrom",
+    "inputs": [
+      { "internalType": "address", "name": "from", "type": "address" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "internalType": "bytes", "name": "_data", "type": "bytes" }
+    ],
+    "type": "function",
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "setApprovalForAll",
+    "inputs": [
+      { "internalType": "address", "name": "operator", "type": "address" },
+      { "internalType": "bool", "name": "approved", "type": "bool" }
+    ],
+    "type": "function",
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "supportsInterface",
+    "inputs": [
+      { "internalType": "bytes4", "name": "interfaceId", "type": "bytes4" }
+    ],
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "symbol",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "tokenURI",
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "type": "function",
+    "stateMutability": "view"
+  },
+  {
+    "name": "transferFrom",
+    "inputs": [
+      { "internalType": "address", "name": "from", "type": "address" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "type": "function",
+    "stateMutability": "nonpayable"
+  }
+]
