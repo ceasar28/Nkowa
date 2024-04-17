@@ -28,7 +28,7 @@ export class RagService {
         },
       );
       if (Upload) {
-        const title = await this.generatePDFTitle('src_RkRpwMJ7BiKkn4zxCJpRf');
+        const title = await this.generatePDFTitle(Upload.data['sourceId']);
         if (title) {
           try {
             const saved = await this.savePdftoDB({
@@ -84,6 +84,7 @@ export class RagService {
       console.log('this is erro :', error);
     }
   };
+
   getSummary = async (sourceId: string) => {
     try {
       const summary = await this.httpService.axiosRef.post(
@@ -112,6 +113,41 @@ export class RagService {
         };
       } else {
         console.log('No summary');
+      }
+    } catch (error) {
+      console.log('this is erro :', error);
+    }
+  };
+
+  chatWithPdf = async (sourceId: string, content: string) => {
+    const payLoad = {
+      sourceId: sourceId,
+      messages: [
+        {
+          role: 'user',
+          content: content,
+        },
+      ],
+    };
+    try {
+      const response = await this.httpService.axiosRef.post(
+        `https://api.chatpdf.com/v1/chats/message`,
+        payLoad,
+        {
+          headers: {
+            'content-Type': 'application/json',
+            'x-api-key': process.env.chatpdfApiKey,
+          },
+        },
+      );
+
+      if (response) {
+        return {
+          sourceId: sourceId,
+          reply: response.data['content'],
+        };
+      } else {
+        console.log('No response');
       }
     } catch (error) {
       console.log('this is erro :', error);

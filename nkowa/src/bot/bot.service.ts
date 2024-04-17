@@ -12,6 +12,8 @@ export class BotService {
   private readonly bot: TelegramBot;
   private logger = new Logger(BotService.name);
   private pdfUrlUploadPrompt = {};
+  private pdfUploadPrompt = {};
+  private startedChatting = {};
 
   constructor(
     private readonly databaseService: DatabaseService,
@@ -28,54 +30,79 @@ export class BotService {
   handleRecievedMessages = async (msg: any) => {
     this.logger.debug(msg);
     try {
-      const command = msg.text;
-      console.log('Command :', command);
-      if (command === '/start') {
-        const username = `${msg.from.first_name} ${msg.from.last_name}`;
-        const welcome = await welcomeMessageMarkup(username);
-        if (welcome) {
-          const replyMarkup = {
-            inline_keyboard: welcome.keyboard,
-          };
-          await this.bot.sendMessage(msg.chat.id, welcome.message, {
-            reply_markup: replyMarkup,
-          });
+      this.bot.sendMessage(msg.chat.id, '⏳ Request Processing .....');
+      if (msg.document) {
+        if (
+          msg.document['mime_type'] == 'application/pdf' &&
+          this.pdfUploadPrompt
+        ) {
+          await this.handlefileUpload(msg.chat.id, msg.document.file_id);
+
+          return;
         }
       } else {
-        if (this.pdfUrlUploadPrompt[msg.chat.id]) {
-          const uploadUrl = await this.ragService.uploadPDFUrl(
-            command,
-            msg.chat.id,
-          );
-          if (uploadUrl) {
-            console.log('API CALL :', uploadUrl);
-            if (uploadUrl['message']) {
-              await this.bot.sendMessage(
-                msg.chat.id,
-                `❌ Error: ${uploadUrl.message}, Please use a viewable PDF url`,
-              );
-            } else {
-              const detail = await pdFDetails(
-                uploadUrl['name'],
-                uploadUrl['url'],
-                uploadUrl['sourceId'],
-              );
-              if (detail) {
-                const Markup = {
-                  inline_keyboard: detail.keyboard,
-                };
-                await this.bot.sendMessage(msg.chat.id, detail.title, {
-                  reply_markup: Markup,
-                });
-                delete this.pdfUrlUploadPrompt[msg.chat.id];
+        const command = msg.text;
+        console.log('Command :', command);
+        if (command === '/start') {
+          const username = `${msg.from.first_name} ${msg.from.last_name}`;
+          const welcome = await welcomeMessageMarkup(username);
+          if (welcome) {
+            const replyMarkup = {
+              inline_keyboard: welcome.keyboard,
+            };
+            await this.bot.sendMessage(msg.chat.id, welcome.message, {
+              reply_markup: replyMarkup,
+            });
+          }
+        } else {
+          if (this.pdfUrlUploadPrompt[msg.chat.id]) {
+            const uploadUrl = await this.ragService.uploadPDFUrl(
+              command,
+              msg.chat.id,
+            );
+            if (uploadUrl) {
+              console.log('API CALL :', uploadUrl);
+              if (uploadUrl['message']) {
+                await this.bot.sendMessage(
+                  msg.chat.id,
+                  `❌ Error: ${uploadUrl.message}, Please use a viewable PDF url`,
+                );
+              } else {
+                const detail = await pdFDetails(
+                  uploadUrl['name'],
+                  uploadUrl['url'],
+                  uploadUrl['sourceId'],
+                );
+                if (detail) {
+                  const Markup = {
+                    inline_keyboard: detail.keyboard,
+                  };
+                  await this.bot.sendMessage(msg.chat.id, detail.title, {
+                    reply_markup: Markup,
+                  });
+                  delete this.pdfUrlUploadPrompt[msg.chat.id];
+                  return;
+                }
                 return;
               }
               return;
             }
             return;
+            console.log('this is a user URL');
+          } else if (this.startedChatting[msg.chat.id].chat) {
+            // start chatting with pdf
+            try {
+              const content = await this.ragService.chatWithPdf(
+                this.startedChatting[msg.chat.id].sourceId,
+                command,
+              );
+              if (content) {
+                return await this.bot.sendMessage(msg.chat.id, content.reply);
+              }
+            } catch (error) {
+              console.log(error);
+            }
           }
-          return;
-          console.log('this is a user URL');
         }
       }
     } catch (error) {
@@ -120,6 +147,18 @@ export class BotService {
 
         case '/fileUploadUrl':
           await this.fileUploadByUrlPrompt(chatId);
+          if (this.startedChatting[chatId].chat) {
+            delete this.startedChatting[chatId];
+            return;
+          }
+          return;
+
+        case '/fileUpload':
+          await this.fileUploadPrompt(chatId);
+          if (this.startedChatting[chatId].chat) {
+            delete this.startedChatting[chatId];
+            return;
+          }
           return;
 
         case '/summary':
@@ -129,6 +168,61 @@ export class BotService {
               return this.bot.sendMessage(chatId, summary.summary);
             } else {
               return this.bot.sendMessage(chatId, 'Error processing summary');
+            }
+          } catch (error) {
+            console.log(error);
+          }
+
+        case '/chatPdf':
+          try {
+            const prompt = this.bot.sendMessage(chatId, 'Start chatting');
+            if (prompt) {
+              // trigger start chat
+              return (this.startedChatting[chatId] = {
+                sourceId: sourceId,
+                chat: true,
+              });
+            }
+          } catch (error) {
+            console.log(error);
+          }
+
+        case '/viewFiles':
+          try {
+            const allFiles = await this.databaseService.pdf.findMany({
+              where: { owner: chatId },
+            });
+            if (allFiles) {
+              const allFilesArray = [...allFiles];
+              if (allFilesArray.length == 0) {
+                return this.bot.sendMessage(
+                  chatId,
+                  '❓ Your PDF list is empty',
+                );
+              } else {
+                allFilesArray.map(async (file) => {
+                  try {
+                    const pdfDetail = await pdFDetails(
+                      file.name,
+                      file.url,
+                      file.sourceId,
+                    );
+                    if (pdfDetail) {
+                      const Markup = {
+                        inline_keyboard: pdfDetail.keyboard,
+                      };
+
+                      await this.bot.sendMessage(chatId, file.name, {
+                        reply_markup: Markup,
+                      });
+                    } else {
+                      return;
+                    }
+                  } catch (error) {
+                    console.log(error);
+                  }
+                });
+              }
             }
           } catch (error) {
             console.log(error);
@@ -172,6 +266,73 @@ export class BotService {
         this.pdfUrlUploadPrompt[chatId] = [uploadUrlPrompt.message_id];
         return;
       }
+      return;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  fileUploadPrompt = async (chatId: any) => {
+    try {
+      const uploadPrompt = await this.bot.sendMessage(
+        chatId,
+        'Upload a PDF file 🔗: make sure it is less than 5mb',
+        { reply_markup: { force_reply: true } },
+      );
+      if (uploadPrompt) {
+        this.pdfUploadPrompt[chatId] = [uploadPrompt.message_id];
+        return;
+      }
+      return;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  handlefileUpload = async (chatId: any, fileId: any) => {
+    try {
+      // Call the getFile method to get information about the file
+      this.bot
+        .getFile(fileId)
+        .then(async (fileInfo) => {
+          // Retrieve the URL of the file
+          const fileUrl = `https://api.telegram.org/file/bot${TELEGRAM_TOKEN}/${fileInfo.file_path}`;
+
+          const uploadUrl = await this.ragService.uploadPDFUrl(fileUrl, chatId);
+          console.log(`this is the url :`, uploadUrl);
+          if (uploadUrl) {
+            console.log('API CALL :', uploadUrl);
+            if (uploadUrl['message']) {
+              await this.bot.sendMessage(
+                chatId,
+                `❌ Error: ${uploadUrl.message}, Please use a viewable PDF url`,
+              );
+            } else {
+              const detail = await pdFDetails(
+                uploadUrl['name'],
+                uploadUrl['url'],
+                uploadUrl['sourceId'],
+              );
+              if (detail) {
+                const Markup = {
+                  inline_keyboard: detail.keyboard,
+                };
+                await this.bot.sendMessage(chatId, detail.title, {
+                  reply_markup: Markup,
+                });
+                delete this.pdfUploadPrompt[chatId];
+                return;
+              }
+              return;
+            }
+            return;
+          }
+          console.log(`PDFurl :`, fileUrl);
+          return fileUrl;
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
       return;
     } catch (error) {
       console.log(error);
