@@ -28,7 +28,7 @@ export class BotService {
   handleRecievedMessages = async (msg: any) => {
     this.logger.debug(msg);
     try {
-      const command = msg.text.toLowerCase();
+      const command = msg.text;
       console.log('Command :', command);
       if (command === '/start') {
         const username = `${msg.from.first_name} ${msg.from.last_name}`;
