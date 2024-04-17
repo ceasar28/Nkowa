@@ -12,7 +12,7 @@ export class RagService {
   ) {}
 
   // upload pdfByUrl
-  uploadPDFUrl = async (url: string) => {
+  uploadPDFUrl = async (url: string, chatId: any) => {
     // console.log(`THIS IS THE URL :`, url);
     try {
       const Upload = await this.httpService.axiosRef.post(
@@ -31,8 +31,17 @@ export class RagService {
         const title = await this.generatePDFTitle('src_RkRpwMJ7BiKkn4zxCJpRf');
         if (title) {
           try {
-            this.savePdftoDB();
-            return Upload.data;
+            const saved = await this.savePdftoDB({
+              name: title,
+              url: url,
+              sourceId: Upload.data['sourceId'],
+              owner: chatId,
+            });
+            if (saved) {
+              console.log('saved pdf :', saved);
+              return saved;
+            }
+            return;
           } catch (error) {
             console.log(error);
           }
@@ -75,12 +84,45 @@ export class RagService {
       console.log('this is erro :', error);
     }
   };
+  getSummary = async (sourceId: string) => {
+    try {
+      const summary = await this.httpService.axiosRef.post(
+        `https://api.chatpdf.com/v1/chats/message`,
+        {
+          sourceId: sourceId,
+          messages: [
+            {
+              role: 'user',
+              content: 'Summarize the pdf',
+            },
+          ],
+        },
+        {
+          headers: {
+            'content-Type': 'application/json',
+            'x-api-key': process.env.chatpdfApiKey,
+          },
+        },
+      );
+
+      if (summary) {
+        return {
+          sourceId: sourceId,
+          summary: summary.data['content'],
+        };
+      } else {
+        console.log('No summary');
+      }
+    } catch (error) {
+      console.log('this is erro :', error);
+    }
+  };
 
   savePdftoDB = async (savePDFDto: Prisma.PdfCreateInput) => {
     try {
       const saved = await this.databaseService.pdf.create({ data: savePDFDto });
       if (saved) {
-        return;
+        return saved;
       }
       return;
     } catch (error) {
