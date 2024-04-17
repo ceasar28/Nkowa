@@ -30,12 +30,15 @@ export class BotService {
   handleRecievedMessages = async (msg: any) => {
     this.logger.debug(msg);
     try {
-      this.bot.sendMessage(msg.chat.id, '⏳ Request Processing .....');
       if (msg.document) {
         if (
           msg.document['mime_type'] == 'application/pdf' &&
           this.pdfUploadPrompt
         ) {
+          await this.bot.sendMessage(
+            msg.chat.id,
+            '⏳ Request Processing .....',
+          );
           await this.handlefileUpload(msg.chat.id, msg.document.file_id);
 
           return;
@@ -44,7 +47,7 @@ export class BotService {
         const command = msg.text;
         console.log('Command :', command);
         if (command === '/start') {
-          const username = `${msg.from.first_name} ${msg.from.last_name}`;
+          const username = `${msg.from.first_name}`;
           const welcome = await welcomeMessageMarkup(username);
           if (welcome) {
             const replyMarkup = {
@@ -56,6 +59,10 @@ export class BotService {
           }
         } else {
           if (this.pdfUrlUploadPrompt[msg.chat.id]) {
+            await this.bot.sendMessage(
+              msg.chat.id,
+              '⏳ Request Processing .....',
+            );
             const uploadUrl = await this.ragService.uploadPDFUrl(
               command,
               msg.chat.id,
@@ -163,6 +170,7 @@ export class BotService {
 
         case '/summary':
           try {
+            await this.bot.sendMessage(chatId, '⏳ Request Processing .....');
             const summary = await this.ragService.getSummary(sourceId);
             if (summary) {
               return this.bot.sendMessage(chatId, summary.summary);
@@ -175,7 +183,10 @@ export class BotService {
 
         case '/chatPdf':
           try {
-            const prompt = this.bot.sendMessage(chatId, 'Start chatting');
+            const prompt = this.bot.sendMessage(
+              chatId,
+              'Start chatting 💬 ...',
+            );
             if (prompt) {
               // trigger start chat
               return (this.startedChatting[chatId] = {
@@ -189,6 +200,7 @@ export class BotService {
 
         case '/viewFiles':
           try {
+            await this.bot.sendMessage(chatId, '⏳ Request Processing .....');
             const allFiles = await this.databaseService.pdf.findMany({
               where: { owner: chatId },
             });
