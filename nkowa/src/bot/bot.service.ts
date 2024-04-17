@@ -115,9 +115,9 @@ export class BotService {
     let command: string;
     let sourceId: string;
     const first_name = query.from.first_name;
-    const last_name = query.from.last_name;
+    // const last_name = query.from.last_name;
     // const user_Id = query.from.id;
-    const username = `${first_name} ${last_name}`;
+    const username = `${first_name}`;
 
     // function to check if query.data is a json type
     function isJSON(str) {
