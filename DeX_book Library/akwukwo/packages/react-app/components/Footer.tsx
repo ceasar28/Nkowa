@@ -47,8 +47,8 @@ export default function Footer() {
         </div>
         <div className="mt-8 md:order-1 md:mt-0">
           <p className="text-center text-base text-black">
-            &copy; {new Date().getFullYear()} Developed with 🖤 by Team Beyond
-            powered by the Celo DevRel team.
+            &copy; {new Date().getFullYear()} Developed with 🖤 by Team
+            Techfrom.
           </p>
         </div>
       </div>
