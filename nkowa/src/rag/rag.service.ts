@@ -165,4 +165,17 @@ export class RagService {
       console.log;
     }
   };
+
+  linkToAkwukwo = async (nkowaId: any, url: string) => {
+    const user = await this.databaseService.user.findFirst({
+      where: { nkowa_id: nkowaId },
+    });
+    if (!user) {
+      return { message: 'user not found' };
+    }
+    const saved = await this.uploadPDFUrl(url, user.chat_id);
+    if (saved) {
+      return { message: ' LInked successful head to https://t.me/nkowa_Bot/' };
+    }
+  };
 }

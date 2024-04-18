@@ -1,6 +1,6 @@
-export const allFeaturesMarkup = async (userName: string) => {
+export const allFeaturesMarkup = async (userName: string, nkowaId: any) => {
   return {
-    message: `Hi ${userName}, kedu! 👋, Welcome to Nkọwa bot your go to Retrieval-augmented generation bot. Here is what I can do:\n\n– Help you summarize any pdf 📄.\n– Interactive Conversation 💬 with your PDF.\n– Generate unique 🌟 content out of your pdf.\n\nShall we start? 👇`,
+    message: `Hi ${userName}, kedu! 👋, Welcome to Nkọwa bot your go to Retrieval-augmented generation bot. Here is what I can do:\n\n– Help you summarize any pdf 📄.\n– Interactive Conversation 💬 with your PDF.\n– Generate unique 🌟 content out of your pdf.\n\nthis is your Nkọwa id: <code>${nkowaId}</code>\n\nShall we start? 👇`,
     keyboard: [
       [
         {
@@ -28,7 +28,7 @@ export const allFeaturesMarkup = async (userName: string) => {
         },
         {
           text: 'Visit Akwụkwọ Our Digital Library 📚',
-          url: 'https://akwukwo-nine.vercel.app/explore',
+          url: 'https://nkowa.vercel.app/explore',
         },
       ],
       [

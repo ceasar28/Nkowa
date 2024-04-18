@@ -3,6 +3,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { welcomeMessageMarkup, allFeaturesMarkup, pdFDetails } from './Markups';
 import { DatabaseService } from 'src/database/database.service';
 import { RagService } from 'src/rag/rag.service';
+import { Prisma } from '@prisma/client';
 // import { convert } from 'html-to-text';
 
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
@@ -14,6 +15,7 @@ export class BotService {
   private pdfUrlUploadPrompt = {};
   private pdfUploadPrompt = {};
   private startedChatting = {};
+  private usedCodes = [];
 
   constructor(
     private readonly databaseService: DatabaseService,
@@ -149,7 +151,21 @@ export class BotService {
     try {
       switch (command) {
         case '/getStarted':
-          await this.sendAllFeature(chatId, username);
+          await this.bot.sendMessage(chatId, '⏳ Request Processing .....');
+          const uniqueCode = await this.generateNkowaId();
+          let userNkowaId = 0;
+          if (uniqueCode) {
+            const user = await this.saveUserToDB({
+              chat_id: chatId,
+              nkowa_id: uniqueCode,
+            });
+            if (user) {
+              userNkowaId = user.nkowa_id;
+            }
+            await this.sendAllFeature(chatId, username, userNkowaId);
+            return;
+          }
+          await this.sendAllFeature(chatId, username, userNkowaId);
           return;
 
         case '/fileUploadUrl':
@@ -251,14 +267,15 @@ export class BotService {
     }
   };
 
-  sendAllFeature = async (chatId: any, username: string) => {
+  sendAllFeature = async (chatId: any, username: string, nkowaId: any) => {
     try {
-      const allFeatures = await allFeaturesMarkup(username);
+      const allFeatures = await allFeaturesMarkup(username, nkowaId);
       if (allFeatures) {
         const replyMarkup = {
           inline_keyboard: allFeatures.keyboard,
         };
         await this.bot.sendMessage(chatId, allFeatures.message, {
+          parse_mode: 'HTML',
           reply_markup: replyMarkup,
         });
       }
@@ -349,5 +366,36 @@ export class BotService {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  // Method to  save a new userdata to the database
+  async saveUserToDB(saveUserDto: Prisma.UserCreateInput) {
+    try {
+      const isSaved = await this.databaseService.user.findFirst({
+        where: { chat_id: saveUserDto.chat_id },
+      });
+      if (!isSaved) {
+        return this.databaseService.user.create({ data: saveUserDto });
+      }
+      return isSaved;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  generateNkowaId = async () => {
+    // Generate a random 4-digit number
+    let code = Math.floor(1000 + Math.random() * 9000);
+
+    // Check if the code is already in use
+    // If yes, generate a new one until it's unique
+    while (this.usedCodes.includes(code)) {
+      code = Math.floor(1000 + Math.random() * 9000);
+    }
+
+    // Add the code to the list of used codes
+    this.usedCodes.push(code);
+
+    return code;
   };
 }
