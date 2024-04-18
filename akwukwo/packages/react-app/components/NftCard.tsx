@@ -69,7 +69,7 @@ const Card: React.FC<CardProps> = ({
         <p className="text-gray-600 mb-1"> {seller}</p>
         <p className="text-green-600 font-semibold">
           {/* //{price.toFixed(2)} Ethers */}
-          {price} Ethers
+          {price} KLAY
         </p>
 
         {router.route === "/profile" ? (
@@ -117,7 +117,7 @@ const Card: React.FC<CardProps> = ({
           price={price}
           tokenId={tokenId}
           seller={seller}
-          listed ={listed}
+          listed={listed}
         ></Modal>
       ) : (
         <></>
