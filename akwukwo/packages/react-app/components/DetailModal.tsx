@@ -184,7 +184,7 @@ const Modal: React.FC<ModalProps> = ({
                       className="block text-gray-700 font-bold mb-2"
                       htmlFor="price"
                     >
-                      New Price in ether
+                      New Price in KLAY
                     </label>
                     <input
                       type="number"
@@ -215,7 +215,7 @@ const Modal: React.FC<ModalProps> = ({
             Description: {description}
           </p>
           <p className="mb-2">Owner: {seller}</p>
-          <p className="text-green-600 font-semibold">{price} ether</p>
+          <p className="text-green-600 font-semibold">{price} KLAY</p>
         </div>
       </div>
       <button
