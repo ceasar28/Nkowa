@@ -1,5 +1,5 @@
 import React from "react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+
 import Link from "next/link";
 
 const LandingPageSection: React.FC = () => {
@@ -32,9 +32,13 @@ const LandingPageSection: React.FC = () => {
                   decentralized apps.
                 </p>
                 <div className="flex absolute bottom-6 content-center">
-                  <ConnectButton
-                    showBalance={{ smallScreen: false, largeScreen: false }}
-                  />
+                  <button
+                    tabIndex={0}
+                    className="is-focus flex items-center gap-x-3 bg-secondary rounded-md p-2 py-4 md:p-4 pl-6 hover:bg-gray-700 bg-blue-500 rounded-lg text-white font-bold"
+                    // onClick={onClick}
+                  >
+                    <span>Connect Wallet</span>
+                  </button>
                 </div>
               </div>
             </Link>

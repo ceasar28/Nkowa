@@ -1,10 +1,12 @@
 import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import Image from "next/image";
+import { useWallet } from "@/context/walletProvider";
 
 export default function Header() {
+  const { wallet, connectMetamask } = useWallet();
+
   return (
     //[#22d3ee]
     <Disclosure as="nav" className="bg-white border-b border-black">
@@ -62,9 +64,27 @@ export default function Header() {
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <ConnectButton
-                  showBalance={{ smallScreen: true, largeScreen: false }}
-                />
+                <button
+                  tabIndex={0}
+                  className="is-focus flex items-center gap-x-3 bg-secondary rounded-md p-2 py-4 md:p-4 pl-6 hover:bg-gray-700 bg-blue-500 rounded-lg font-bold "
+                  onClick={async () => {
+                    // Todo: call the connect wallet function for compass
+                    const address = await connectMetamask();
+                    if (address) {
+                      console.log(`Address : ${address.address}`);
+                    }
+
+                    return;
+                  }}
+                >
+                  <span>
+                    {wallet.metaMask == "" ? (
+                      <p>Connect Wallet</p>
+                    ) : (
+                      <p>Connected</p>
+                    )}
+                  </span>
+                </button>
               </div>
             </div>
           </div>
