@@ -28,7 +28,7 @@ export const allFeaturesMarkup = async (userName: string, nkowaId: any) => {
         },
         {
           text: 'Visit Akwụkwọ Our Digital Library 📚',
-          url: 'https://nkowa.vercel.app/explore',
+          url: 'https://nkowa.vercel.app/',
         },
       ],
       [
